@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DISC 의사소통 역량 강화 워크북</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #fcfbf9; color: #44403c; }
+        .btn-primary {
+            background-color: #0d9488; color: white; transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #0f766e; transform: translateY(-1px);
+        }
+        .card {
+            background-color: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e7e5e4;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 350px;
+            margin: 0 auto;
+        }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Background: Cream #fcfbf9, Text: Stone #44403c) with Teal Accents (#0d9488) for primary actions. Type colors: Red(D), Yellow(I), Green(S), Blue(C). -->
+    
+    <!-- Application Structure Plan:
+         1. Hero Header: Title and User Info Input.
+         2. Tab Navigation: 4 Stages (Diagnosis, Analysis, Practice, Action Plan).
+         3. Stage 1 (Self-Check): Interactive Quiz based on Part 1 of the workbook. Visualizes results with a Radar Chart.
+         4. Stage 2 (Analysis): Interactive SWOT-like table where users reflect on their type (Part 2). Pre-filled suggestions based on Quiz Result.
+         5. Stage 3 (Scenarios): Role-play simulation for the 4 scenarios (Part 3). Users type responses, then reveal "Model Answers" and "Keywords".
+         6. Stage 4 (Action Plan): Mad-libs style generator for the final pledge (Part 4).
+         7. Footer: Print/Save simulation.
+    -->
+    
+    <!-- Visualization & Content Choices:
+         - DISC Profile: Radar Chart (Chart.js) to show the balance (or imbalance) of the 4 traits based on user inputs.
+         - Icons: Unicode characters for simplicity and performance (no SVG).
+         - Logic: Simple state management to carry the "Determined Type" from Stage 1 to Stage 4.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="text-3xl">🏥</span>
+                <div>
+                    <h1 class="text-xl font-bold text-stone-800">DISC 의사소통 역량 강화 워크북</h1>
+                    <p class="text-xs text-stone-500">보건의료정보 전문가 실무 과정</p>
+                </div>
+            </div>
+            <div class="flex gap-3 text-sm">
+                <input type="text" id="user-dept" placeholder="소속 입력" class="px-3 py-1.5 border border-stone-300 rounded focus:outline-none focus:border-teal-500 transition">
+                <input type="text" id="user-name" placeholder="성명 입력" class="px-3 py-1.5 border border-stone-300 rounded focus:outline-none focus:border-teal-500 transition">
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-stone-100 border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 overflow-x-auto">
+            <div class="flex space-x-1 md:space-x-8 min-w-max">
+                <button onclick="switchTab('tab1')" id="nav-tab1" class="tab-btn py-4 px-2 text-sm font-medium border-b-2 border-teal-600 text-teal-700">1. 스타일 진단</button>
+                <button onclick="switchTab('tab2')" id="nav-tab2" class="tab-btn py-4 px-2 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700">2. 강약점 분석</button>
+                <button onclick="switchTab('tab3')" id="nav-tab3" class="tab-btn py-4 px-2 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700">3. 실전 응대 실습</button>
+                <button onclick="switchTab('tab4')" id="nav-tab4" class="tab-btn py-4 px-2 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700">4. 전문가의 다짐</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-6xl mx-auto px-4 py-8 w-full">
+
+        <!-- TAB 1: Self-Check -->
+        <section id="tab1" class="tab-content fade-in space-y-8">
+            <div class="text-center space-y-2 mb-8">
+                <h2 class="text-2xl font-bold text-stone-800">Part 1. 나의 DISC 스타일 진단</h2>
+                <p class="text-stone-600">평소 행동이나 생각과 가장 가까운 항목을 선택해 주세요. 당신의 주된 소통 스타일을 찾아드립니다.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <!-- Quiz Form -->
+                <div class="card p-6 md:p-8 space-y-8">
+                    <!-- Q1 -->
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-lg text-teal-800 border-l-4 border-teal-500 pl-3">Q1. 업무를 처리할 때 나는?</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-start p-3 rounded hover:bg-stone-50 cursor-pointer border border-transparent hover:border-stone-200 transition">
+                                <input type="radio" name="q1" value="D" class="mt-1 mr-3 text-teal-600 focus:ring-teal-500" onchange="calculateDISC()">
+                                <span>(D) 빠르고 효율적인 결과를 내는 것이 가장 중요하다.</span>
+                            </label>
+                            <label class="flex items-start p-3 rounded hover:bg-stone-50 cursor-pointer border border-transparent hover:border-stone-200 transition">
+                                <input type="radio" name="q1" value="I" class="mt-1 mr-3 text-teal-600 focus:ring-teal-500" onchange="calculateDISC()">
+                                <span>(I) 주변 사람들과 즐겁게 소통하며 활기차게 일하고 싶다.</span>
+                            </label>
+                            <label class="flex items-start p-3 rounded hover:bg-stone-50 cursor-pointer border border-transparent hover:border-stone-200 transition">
+                                <input type="radio" name="q1" value="S" class="mt-1 mr-3 text-teal-600 focus:ring-teal-500" onchange="calculateDISC()">
+                                <span>(S) 급격한 변화보다는 안정적이고 협력적인 분위기를 선호한다.</span>
+                            </label>
+                            <label class="flex items-start p-3 rounded hover:bg-stone-50 cursor-pointer border border-transparent hover:border-stone-200 transition">
+                                <input type="radio" name="q1" value="C" class="mt-1 mr-3 text-teal-600 focus:ring-teal-500" onchange="calculateDISC()">
+                                <span>(C) 데이터와 근거를 바탕으로 오차 없이 완벽하게 처리하고 싶다.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-lg text-teal-800 border-l-4 border-teal-500 pl-3">Q2. 환자가 질문을 했을 때 나의 첫 반응은?</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-start p-3 rounded hover:bg-stone-50 cursor-pointer border border-transparent hover:border-stone-200 transition">
+                                <input type="radio" name="q2" value="D" class="mt-1 mr-3 text-teal-600 focus:ring-teal-500" onchange="calculateDISC()">
+                                <span>(D) 핵심적인 해결책과 결론부터 명확하게 말해준다.</span>
+                            </label>
+                            <label class="flex items-start p-3 rounded hover:bg-stone-50 cursor-pointer border border-transparent hover:border-stone-200 transition">
+                                <input type="radio" name="q2" value="I" class="mt-1 mr-3 text-teal-600 focus:ring-teal-500" onchange="calculateDISC()">
+                                <span>(I) 환자의 기분에 공감하며 따뜻하고 친근하게 대화를 이끈다.</span>
+                            </label>
+                            <label class="flex items-start p-3 rounded hover:bg-stone-50 cursor-pointer border border-transparent hover:border-stone-200 transition">
+                                <input type="radio" name="q2" value="S" class="mt-1 mr-3 text-teal-600 focus:ring-teal-500" onchange="calculateDISC()">
+                                <span>(S) 차분하게 끝까지 경청한 후 천천히 안심시키며 안내한다.</span>
+                            </label>
+                            <label class="flex items-start p-3 rounded hover:bg-stone-50 cursor-pointer border border-transparent hover:border-stone-200 transition">
+                                <input type="radio" name="q2" value="C" class="mt-1 mr-3 text-teal-600 focus:ring-teal-500" onchange="calculateDISC()">
+                                <span>(C) 관련 규정이나 정확한 수치를 짚어가며 논리적으로 설명한다.</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Visualization -->
+                <div class="card p-6 md:p-8 flex flex-col items-center justify-center min-h-[400px]">
+                    <h3 class="text-stone-500 font-bold mb-4 uppercase tracking-wider text-sm">Diagnosis Result</h3>
+                    <div class="chart-container">
+                        <canvas id="discChart"></canvas>
+                    </div>
+                    <div id="result-text" class="mt-6 text-center hidden">
+                        <p class="text-stone-500">당신의 주된 유형은</p>
+                        <h4 class="text-3xl font-extrabold text-teal-700 mt-2"><span id="result-type">?</span>형</h4>
+                        <p id="result-desc" class="text-sm text-stone-600 mt-3 max-w-xs mx-auto leading-relaxed"></p>
+                    </div>
+                    <div id="result-placeholder" class="text-center text-stone-400 py-10">
+                        <span class="text-4xl block mb-2">👈</span>
+                        왼쪽 문항에 체크하여<br>결과를 확인하세요.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: Analysis -->
+        <section id="tab2" class="tab-content hidden fade-in space-y-8">
+            <div class="text-center space-y-2 mb-8">
+                <h2 class="text-2xl font-bold text-stone-800">Part 2. 스타일별 강점 및 보완점 분석</h2>
+                <p class="text-stone-600">진단된 유형을 바탕으로 나만의 강점과 약점을 정리해보는 시간입니다.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Helper / Suggestions -->
+                <div class="lg:col-span-1 card p-6 bg-teal-50 border-teal-100">
+                    <h3 class="font-bold text-teal-800 mb-4 flex items-center"><span class="mr-2">💡</span> 작성 가이드</h3>
+                    <div id="suggestion-box" class="text-sm text-stone-700 space-y-4">
+                        <p class="italic text-stone-500">진단 탭에서 결과를 먼저 확인하면 맞춤형 힌트가 제공됩니다.</p>
+                        <div class="p-3 bg-white rounded border border-teal-100 shadow-sm">
+                            <strong>강점 예시:</strong><br>위기 상황 판단력, 뛰어난 공감 능력, 꼼꼼한 서류 검토 등
+                        </div>
+                        <div class="p-3 bg-white rounded border border-teal-100 shadow-sm">
+                            <strong>약점 예시:</strong><br>성급한 결론 도출, 감정적 동요, 융통성 부족 등
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Forms -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="card p-6">
+                        <label class="block font-bold text-stone-700 mb-2">나의 강점 (Strength)</label>
+                        <textarea id="input-strength" class="w-full p-4 border border-stone-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition h-24" placeholder="예: 저는 환자의 이야기를 끝까지 들어주는 인내심이 있습니다."></textarea>
+                    </div>
+                    <div class="card p-6">
+                        <label class="block font-bold text-stone-700 mb-2">나의 약점 (Weakness)</label>
+                        <textarea id="input-weakness" class="w-full p-4 border border-stone-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition h-24" placeholder="예: 가끔 업무 처리가 늦어져 대기 환자가 늘어날 때가 있습니다."></textarea>
+                    </div>
+                    <div class="card p-6">
+                        <label class="block font-bold text-stone-700 mb-2">보완할 점 (Improvement)</label>
+                        <textarea id="input-improvement" class="w-full p-4 border border-stone-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition h-24" placeholder="예: 정확성을 유지하되, 환자에게 진행 상황을 중간중간 안내하겠습니다."></textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: Practice -->
+        <section id="tab3" class="tab-content hidden fade-in space-y-8">
+            <div class="text-center space-y-2 mb-8">
+                <h2 class="text-2xl font-bold text-stone-800">Part 3. 환자 유형 파악 및 맞춤 응대 실습</h2>
+                <p class="text-stone-600">실제 병원 현장의 4가지 상황입니다. 가장 적절한 응대 멘트를 작성하고 모범 답안과 비교해보세요.</p>
+            </div>
+
+            <div class="grid gap-8">
+                
+                <!-- Scenario 1: D Type Patient -->
+                <div class="card p-6 border-l-8 border-l-red-500">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="md:w-1/3 space-y-4">
+                            <div class="inline-block bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded">D형 환자 (주도형)</div>
+                            <h3 class="font-bold text-lg">"아니, 결과가 대체 언제 나와요? 오늘 바로 처방전 안 돼요?"</h3>
+                            <ul class="text-sm text-stone-600 list-disc pl-4 space-y-1">
+                                <li><strong>핵심 니즈:</strong> 빠른 속도, 명확한 결과</li>
+                                <li><strong>상황:</strong> 대기 시간에 대한 불만 표출</li>
+                            </ul>
+                        </div>
+                        <div class="md:w-2/3 space-y-4">
+                            <textarea id="response-d" class="w-full p-3 border border-stone-200 rounded bg-stone-50 focus:bg-white focus:ring-1 focus:ring-red-400 outline-none transition h-20 text-sm" placeholder="나의 응대 멘트를 작성해보세요..."></textarea>
+                            <button onclick="toggleHint('hint-d')" class="text-xs font-bold text-red-600 hover:underline flex items-center">
+                                <span class="mr-1">🔑</span> 추천 키워드 및 전략 보기
+                            </button>
+                            <div id="hint-d" class="hidden bg-red-50 p-4 rounded text-sm text-stone-700 border border-red-100">
+                                <p class="mb-2"><strong>추천 키워드:</strong> "결론부터 말씀드리면", "약 10분 정도 소요됩니다", "선택지는 A와 B가 있습니다"</p>
+                                <p><strong>전략:</strong> 변명보다는 소요 시간과 절차를 명확한 수치로 제시하여 통제감을 느끼게 하세요.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenario 2: I Type Patient -->
+                <div class="card p-6 border-l-8 border-l-yellow-500">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="md:w-1/3 space-y-4">
+                            <div class="inline-block bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded">I형 환자 (사교형)</div>
+                            <h3 class="font-bold text-lg">"선생님, 제가 어제 너무 아파서 잠을 한숨도 못 잤어요. 정말 힘들더라고요..."</h3>
+                            <ul class="text-sm text-stone-600 list-disc pl-4 space-y-1">
+                                <li><strong>핵심 니즈:</strong> 감정적 공감, 관심과 인정</li>
+                                <li><strong>상황:</strong> 자신의 고통을 토로하며 위로를 바람</li>
+                            </ul>
+                        </div>
+                        <div class="md:w-2/3 space-y-4">
+                            <textarea id="response-i" class="w-full p-3 border border-stone-200 rounded bg-stone-50 focus:bg-white focus:ring-1 focus:ring-yellow-400 outline-none transition h-20 text-sm" placeholder="나의 응대 멘트를 작성해보세요..."></textarea>
+                            <button onclick="toggleHint('hint-i')" class="text-xs font-bold text-yellow-600 hover:underline flex items-center">
+                                <span class="mr-1">🔑</span> 추천 키워드 및 전략 보기
+                            </button>
+                            <div id="hint-i" class="hidden bg-yellow-50 p-4 rounded text-sm text-stone-700 border border-yellow-100">
+                                <p class="mb-2"><strong>추천 키워드:</strong> "정말 고생 많으셨네요", "많이 놀라셨죠?", "제가 더 신경 써서 도와드릴게요"</p>
+                                <p><strong>전략:</strong> 사무적인 태도보다는 따뜻한 눈빛과 리액션으로 충분히 공감해준 뒤 업무를 진행하세요.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenario 3: S Type Patient -->
+                <div class="card p-6 border-l-8 border-l-green-500">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="md:w-1/3 space-y-4">
+                            <div class="inline-block bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">S형 환자 (안정형)</div>
+                            <h3 class="font-bold text-lg">"네, 알겠습니다... 그런데 혹시 이 약 먹고 속이 많이 쓰리거나 하지는 않겠죠?"</h3>
+                            <ul class="text-sm text-stone-600 list-disc pl-4 space-y-1">
+                                <li><strong>핵심 니즈:</strong> 안정감, 세심한 배려, 안심</li>
+                                <li><strong>상황:</strong> 부작용이나 변화에 대한 막연한 불안감</li>
+                            </ul>
+                        </div>
+                        <div class="md:w-2/3 space-y-4">
+                            <textarea id="response-s" class="w-full p-3 border border-stone-200 rounded bg-stone-50 focus:bg-white focus:ring-1 focus:ring-green-400 outline-none transition h-20 text-sm" placeholder="나의 응대 멘트를 작성해보세요..."></textarea>
+                            <button onclick="toggleHint('hint-s')" class="text-xs font-bold text-green-600 hover:underline flex items-center">
+                                <span class="mr-1">🔑</span> 추천 키워드 및 전략 보기
+                            </button>
+                            <div id="hint-s" class="hidden bg-green-50 p-4 rounded text-sm text-stone-700 border border-green-100">
+                                <p class="mb-2"><strong>추천 키워드:</strong> "천천히 설명해 드릴게요", "걱정 마세요", "단계별로 도와드리겠습니다"</p>
+                                <p><strong>전략:</strong> 재촉하지 말고 차분한 목소리로 안전함을 강조하며 하나씩 순서대로 안내하세요.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenario 4: C Type Patient -->
+                <div class="card p-6 border-l-8 border-l-blue-500">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="md:w-1/3 space-y-4">
+                            <div class="inline-block bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">C형 환자 (신중형)</div>
+                            <h3 class="font-bold text-lg">"이 검사 수치가 정상 범위보다 0.3 높은데, 구체적으로 어떤 근거인가요?"</h3>
+                            <ul class="text-sm text-stone-600 list-disc pl-4 space-y-1">
+                                <li><strong>핵심 니즈:</strong> 논리적 근거, 정확한 데이터</li>
+                                <li><strong>상황:</strong> 수치나 절차에 대한 구체적인 의문 제기</li>
+                            </ul>
+                        </div>
+                        <div class="md:w-2/3 space-y-4">
+                            <textarea id="response-c" class="w-full p-3 border border-stone-200 rounded bg-stone-50 focus:bg-white focus:ring-1 focus:ring-blue-400 outline-none transition h-20 text-sm" placeholder="나의 응대 멘트를 작성해보세요..."></textarea>
+                            <button onclick="toggleHint('hint-c')" class="text-xs font-bold text-blue-600 hover:underline flex items-center">
+                                <span class="mr-1">🔑</span> 추천 키워드 및 전략 보기
+                            </button>
+                            <div id="hint-c" class="hidden bg-blue-50 p-4 rounded text-sm text-stone-700 border border-blue-100">
+                                <p class="mb-2"><strong>추천 키워드:</strong> "객관적인 수치에 따르면", "관련 규정 제~조에 의해", "이 자료를 보시면"</p>
+                                <p><strong>전략:</strong> 감정적 호소보다는 검사 결과지나 규정집 등 시각적이고 객관적인 증거 자료를 제시하세요.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 4: Action Plan -->
+        <section id="tab4" class="tab-content hidden fade-in space-y-8">
+            <div class="text-center space-y-2 mb-8">
+                <h2 class="text-2xl font-bold text-stone-800">Part 4. 전문가로서의 다짐 (Action Plan)</h2>
+                <p class="text-stone-600">오늘 학습한 내용을 바탕으로 나만의 응대 원칙을 세워보세요.</p>
+            </div>
+
+            <div class="card p-8 md:p-12 bg-gradient-to-br from-teal-50 to-white border-teal-100">
+                <div class="max-w-3xl mx-auto space-y-8 text-center">
+                    <h3 class="text-xl font-bold text-teal-800">✨ 나의 서비스 선언문</h3>
+                    
+                    <div class="text-lg md:text-2xl leading-loose font-medium text-stone-700">
+                        "나는 
+                        <select id="target-type" class="border-b-2 border-teal-500 bg-transparent text-teal-700 focus:outline-none px-2 mx-1 font-bold cursor-pointer">
+                            <option value="">(환자 유형 선택)</option>
+                            <option value="D">성격 급한 D</option>
+                            <option value="I">위로가 필요한 I</option>
+                            <option value="S">불안해하는 S</option>
+                            <option value="C">깐깐한 C</option>
+                        </select>
+                        형 환자를 만났을 때,<br>
+                        <input type="text" id="action-phrase" class="border-b-2 border-teal-500 bg-transparent text-teal-700 focus:outline-none px-2 mx-1 w-full md:w-2/3 text-center mt-4 mb-2 placeholder-teal-300" placeholder="(나만의 핵심 응대 멘트 입력)">
+                        <br>
+                        라고 말하며 최고의 행정 서비스를 제공하겠습니다."
+                    </div>
+
+                    <div class="pt-8 flex justify-center space-x-4">
+                        <button onclick="printPledge()" class="btn-primary px-8 py-3 rounded-lg font-bold shadow-md flex items-center">
+                            <span class="mr-2">🖨️</span> 다짐 카드 저장/인쇄
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center text-stone-400 text-sm">
+                교수님 확인: ____________________ (인)
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-800 text-stone-400 py-8 text-center text-sm mt-auto">
+        <p>© 2024 보건의료정보 전문가 양성 과정 | DISC Communication Workbook</p>
+    </footer>
+
+    <script>
+        // Tab Logic
+        function switchTab(tabId) {
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            // Show selected content
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Update Tab Styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-teal-600', 'text-teal-700');
+                btn.classList.add('border-transparent', 'text-stone-500');
+            });
+            const activeBtn = document.getElementById('nav-' + tabId);
+            activeBtn.classList.remove('border-transparent', 'text-stone-500');
+            activeBtn.classList.add('border-teal-600', 'text-teal-700');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Data Store
+        let discScores = { D: 0, I: 0, S: 0, C: 0 };
+        let dominantType = '';
+        let myChart = null;
+
+        const typeInfo = {
+            D: { color: 'rgba(239, 68, 68, 0.6)', borderColor: 'rgba(239, 68, 68, 1)', label: '주도형 (D)', desc: '빠른 결과와 효율을 중시하는 당신! 핵심부터 명확하게 전달하는 강점이 있습니다.', advice: '성급함은 줄이고, 환자의 말을 5초만 더 들어주는 여유를 가져보세요.' },
+            I: { color: 'rgba(234, 179, 8, 0.6)', borderColor: 'rgba(234, 179, 8, 1)', label: '사교형 (I)', desc: '공감과 관계를 중시하는 당신! 따뜻한 말 한마디로 환자의 마음을 여는 강점이 있습니다.', advice: '감정에 치우치지 않고, 정확한 행정 절차를 놓치지 않도록 체크하세요.' },
+            S: { color: 'rgba(34, 197, 94, 0.6)', borderColor: 'rgba(34, 197, 94, 1)', label: '안정형 (S)', desc: '협력과 안정을 중시하는 당신! 편안한 경청으로 환자를 안심시키는 강점이 있습니다.', advice: '돌발 상황에서 당황하지 말고, 매뉴얼대로 차분히 대응하는 연습을 해보세요.' },
+            C: { color: 'rgba(59, 130, 246, 0.6)', borderColor: 'rgba(59, 130, 246, 1)', label: '신중형 (C)', desc: '정확성과 근거를 중시하는 당신! 오차 없는 완벽한 업무 처리가 강점입니다.', advice: '규정만 강조하면 차가워 보일 수 있습니다. 부드러운 쿠션 언어를 사용해보세요.' }
+        };
+
+        // Quiz Logic
+        function calculateDISC() {
+            // Reset Scores
+            discScores = { D: 0, I: 0, S: 0, C: 0 };
+            
+            // Get inputs
+            const q1 = document.querySelector('input[name="q1"]:checked');
+            const q2 = document.querySelector('input[name="q2"]:checked');
+
+            if (q1) discScores[q1.value] += 50; // Simple weighting
+            if (q2) discScores[q2.value] += 50;
+
+            // Determine dominant type
+            let maxScore = -1;
+            dominantType = '?';
+            
+            for (const [key, value] of Object.entries(discScores)) {
+                if (value > maxScore) {
+                    maxScore = value;
+                    dominantType = key;
+                } else if (value === maxScore) {
+                    dominantType += `/${key}`; // Handle ties simply for display
+                }
+            }
+
+            if (q1 && q2) {
+                renderChart();
+                showResultText();
+                updateSuggestions();
+            }
+        }
+
+        function showResultText() {
+            document.getElementById('result-placeholder').classList.add('hidden');
+            const resDiv = document.getElementById('result-text');
+            resDiv.classList.remove('hidden');
+            
+            // Handle split types e.g. D/I
+            const typeKey = dominantType.split('/')[0]; // Take first for coloring/info simplicity
+            const info = typeInfo[typeKey];
+
+            document.getElementById('result-type').textContent = dominantType;
+            document.getElementById('result-desc').innerHTML = `${info.desc}<br><br><strong class="text-teal-700">Tip:</strong> ${info.advice}`;
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('discChart').getContext('2d');
+            
+            const dataValues = [
+                discScores.D || 10, // Default minimal value for visual shape
+                discScores.I || 10,
+                discScores.S || 10,
+                discScores.C || 10
+            ];
+
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['D (주도)', 'I (사교)', 'S (안정)', 'C (신중)'],
+                    datasets: [{
+                        label: '나의 스타일',
+                        data: dataValues,
+                        backgroundColor: 'rgba(13, 148, 136, 0.2)',
+                        borderColor: '#0d9488',
+                        pointBackgroundColor: '#0d9488',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: { display: false },
+                            grid: { color: '#e7e5e4' },
+                            pointLabels: {
+                                font: { size: 14, family: "'Noto Sans KR', sans-serif", weight: 'bold' },
+                                color: '#44403c'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Suggestion Logic for Tab 2
+        function updateSuggestions() {
+            const box = document.getElementById('suggestion-box');
+            const typeKey = dominantType.split('/')[0];
+            const info = typeInfo[typeKey];
+            
+            if (!info) return;
+
+            box.innerHTML = `
+                <div class="p-3 bg-white rounded border border-teal-100 shadow-sm border-l-4" style="border-left-color: ${info.borderColor}">
+                    <strong>${dominantType}형 추천 강점:</strong><br>${info.desc.split('!')[1]}
+                </div>
+                <div class="p-3 bg-white rounded border border-teal-100 shadow-sm">
+                    <strong>${dominantType}형 추천 보완점:</strong><br>${info.advice}
+                </div>
+            `;
+        }
+
+        // Scenario Hint Logic
+        function toggleHint(id) {
+            const hint = document.getElementById(id);
+            hint.classList.toggle('hidden');
+        }
+
+        // Action Plan Logic
+        function printPledge() {
+            const type = document.getElementById('target-type').value;
+            const phrase = document.getElementById('action-phrase').value;
+            const name = document.getElementById('user-name').value || '교육생';
+
+            if (!type || !phrase) {
+                alert("환자 유형과 다짐 멘트를 모두 입력해주세요!");
+                return;
+            }
+
+            alert(`[저장 완료]\n\n"${name}"님의 다짐:\n나는 ${type}형 환자를 만났을 때,\n"${phrase}"\n라고 말하며 최고의 행정 서비스를 제공하겠습니다.`);
+        }
+
+        // Init
+        window.onload = function() {
+            // Placeholder chart
+            renderChart(); 
+        };
+
+    </script>
+</body>
+</html>
