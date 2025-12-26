@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>보건의사소통과 행정 실무 | 교재 탐색기</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Warm Neutral (Stone & Blue Accent) -->
+    <!-- Application Structure Plan: '허브 앤 스포크(hub-and-spoke)' 모델을 사용합니다. 메인 네비게이션은 교재의 5개 'PART'와 '부록'을 나타내는 카드 그리드로 구성됩니다. 사용자가 카드를 클릭하면, 해당 PART의 챕터 목록이 하단의 콘텐츠 영역에 동적으로 표시됩니다. 각 챕터는 아코디언(collapsible) UI로 제공되어, 클릭 시 세부 항목을 펼쳐볼 수 있습니다. 이 구조는 정적인 목차 목록보다 사용자의 능동적인 탐색을 유도하며, 계층적 데이터를 쉽게 이해할 수 있도록 돕습니다. -->
+    <!-- Visualization & Content Choices: 보고서 정보(ToC 계층 구조) -> 목표(계층 구조의 조직화 및 탐색) -> 시각화/표현(PART용 HTML/Tailwind 카드 그리드, 챕터/섹션용 HTML/JS 아코디언) -> 상호작용(클릭 시 콘텐츠 표시/숨김, 클릭 시 아코디언 확장/축소) -> 정당성(계층적 텍스트 데이터에 가장 직관적인 UI) -> 라이브러리/방법(DOM 조작을 위한 Vanilla JS). 정량 데이터가 없으므로 차트는 사용하지 않았습니다. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', 'Pretendard', sans-serif;
+        }
+        .nav-card {
+            transition: all 0.3s ease-in-out;
+        }
+        .nav-card.active {
+            transform: translateY(-5px) scale(1.03);
+            background-color: #2563eb; /* text-blue-600 */
+            color: white;
+        }
+        .accordion-content {
+            transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+        }
+        .accordion-content.open {
+            max-height: 500px; /* 충분한 높이 */
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .accordion-button .icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .accordion-button.open .icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <div class="container mx-auto max-w-5xl p-4 md:p-8">
+        
+        <!-- Header -->
+        <header class="text-center mb-10 md:mb-16">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-800">[교재안] 보건의사소통과 행정 실무</h1>
+            <p class="text-lg md:text-xl text-stone-600 mt-2">목소리부터 손글씨까지, 병원 행정 전문가의 품격</p>
+        </header>
+
+        <!-- Main Navigation (Hub) -->
+        <nav id="part-navigation" class="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-6 mb-10 md:mb-12">
+            <button data-target="part-0" class="nav-card bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 border border-stone-200 text-left">
+                <span class="block text-sm font-semibold text-blue-600">머리말</span>
+                <span class="block text-lg font-bold mt-1">교재 활용법</span>
+            </button>
+            <button data-target="part-1" class="nav-card bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 border border-stone-200 text-left">
+                <span class="block text-sm font-semibold text-blue-600">PART 1</span>
+                <span class="block text-lg font-bold mt-1">기초와 마인드셋</span>
+            </button>
+            <button data-target="part-2" class="nav-card bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 border border-stone-200 text-left">
+                <span class="block text-sm font-semibold text-blue-600">PART 2</span>
+                <span class="block text-lg font-bold mt-1">[말하기] 보이스 트레이닝</span>
+            </button>
+            <button data-target="part-3" class="nav-card bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 border border-stone-200 text-left">
+                <span class="block text-sm font-semibold text-blue-600">PART 3</span>
+                <span class="block text-lg font-bold mt-1">[쓰기] 악필 교정과 행정 문서</span>
+            </button>
+            <button data-target="part-4" class="nav-card bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 border border-stone-200 text-left">
+                <span class="block text-sm font-semibold text-blue-600">PART 4</span>
+                <span class="block text-lg font-bold mt-1">[실무] 상황별 응대와 문제 해결</span>
+            </button>
+            <button data-target="part-5" class="nav-card bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 border border-stone-200 text-left">
+                <span class="block text-sm font-semibold text-blue-600">PART 5 & 부록</span>
+                <span class="block text-lg font-bold mt-1">취업과 워크북</span>
+            </button>
+        </nav>
+
+        <!-- Content Display Area -->
+        <main id="content-display" class="bg-white rounded-lg shadow-lg p-6 md:p-10 min-h-[300px]">
+            
+            <!-- Default Message -->
+            <div id="default-message" class="text-center text-stone-500 py-20">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13.5M6.253 12h13.5" />
+                </svg>
+                <p class="mt-4 text-lg">상단의 파트(PART)를 선택하여<br>세부 챕터 내용을 확인하세요.</p>
+            </div>
+
+            <!-- Part 0 Content: 머리말 -->
+            <div id="part-0-content" class="content-section hidden space-y-4">
+                <h2 class="text-2xl font-bold text-blue-700 border-b pb-2 mb-4">머리말</h2>
+                <ul class="list-disc list-inside text-stone-700 space-y-2 pl-2">
+                    <li>보건행정인에게 왜 '소통'과 '기록'이 중요한가?</li>
+                    <li>이 책의 활용법 (워크북 및 진단 가이드)</li>
+                </ul>
+            </div>
+
+            <!-- Part 1 Content: 기초와 마인드셋 -->
+            <div id="part-1-content" class="content-section hidden space-y-4">
+                <h2 class="text-2xl font-bold text-blue-700 border-b pb-2 mb-4">PART 1. 보건의사소통의 기초와 마인드셋</h2>
+                <!-- Accordion for Chapter 1 -->
+                <div class="accordion-item border rounded-lg overflow-hidden">
+                    <button class="accordion-button w-full flex justify-between items-center p-4 bg-stone-100 hover:bg-stone-200">
+                        <span class="text-lg font-semibold">Chapter 1. 보건행정 전문가의 역할</span>
+                        <span class="icon text-2xl font-light text-blue-600">▼</span>
+                    </button>
+                    <div class="accordion-content bg-white px-5">
+                        <ul class="list-decimal list-inside text-stone-700 space-y-2">
+                            <li>병원의 얼굴, 원무 행정직의 서비스 마인드</li>
+                            <li>의료 서비스 커뮤니케이션의 특수성</li>
+                            <li>[Self-Check] 나의 의사소통 스타일 진단 (DISC 등 활용)</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Accordion for Chapter 2 -->
+                <div class="accordion-item border rounded-lg overflow-hidden">
+                    <button class="accordion-button w-full flex justify-between items-center p-4 bg-stone-100 hover:bg-stone-200">
+                        <span class="text-lg font-semibold">Chapter 2. 비언어적 커뮤니케이션과 이미지</span>
+                        <span class="icon text-2xl font-light text-blue-600">▼</span>
+                    </button>
+                    <div class="accordion-content bg-white px-5">
+                        <ul class="list-decimal list-inside text-stone-700 space-y-2">
+                            <li>신뢰감을 주는 용모와 복장 (Appearance)</li>
+                            <li>태도(Attitude)와 표정 관리</li>
+                            <li>인사의 정석: 상황별 인사법과 자세</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part 2 Content: [말하기] 보이스 트레이닝 -->
+            <div id="part-2-content" class="content-section hidden space-y-4">
+                <h2 class="text-2xl font-bold text-blue-700 border-b pb-2 mb-4">PART 2. [말하기] 신뢰감을 주는 보이스 트레이닝</h2>
+                <!-- Accordion for Chapter 3 -->
+                <div class="accordion-item border rounded-lg overflow-hidden">
+                    <button class="accordion-button w-full flex justify-between items-center p-4 bg-stone-100 hover:bg-stone-200">
+                        <span class="text-lg font-semibold">Chapter 3. 보이스 트레이닝 기초</span>
+                        <span class="icon text-2xl font-light text-blue-600">▼</span>
+                    </button>
+                    <div class="accordion-content bg-white px-5">
+                        <ul class="list-decimal list-inside text-stone-700 space-y-2">
+                            <li>[호흡] 떨리지 않는 편안한 목소리를 위한 복식호흡</li>
+                            <li>[발성] 병원 로비를 뚫고 나가는 공명음 만들기</li>
+                            <li>[발음] 정확한 정보 전달을 위한 조음 기관 훈련 (입술, 혀 근육 풀기)</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Accordion for Chapter 4 -->
+                <div class="accordion-item border rounded-lg overflow-hidden">
+                    <button class="accordion-button w-full flex justify-between items-center p-4 bg-stone-100 hover:bg-stone-200">
+                        <span class="text-lg font-semibold">Chapter 4. 상황별 말하기 실전</span>
+                        <span class="icon text-2xl font-light text-blue-600">▼</span>
+                    </button>
+                    <div class="accordion-content bg-white px-5">
+                        <ul class="list-decimal list-inside text-stone-700 space-y-2">
+                            <li>쿠션 언어의 마법: 거절과 요청을 부드럽게 하는 법</li>
+                            <li>청각적 이미지 메이킹: 보이지 않는 전화 응대 (텔레매너)</li>
+                            <li>안내 방송 실습: 원내 방송문 낭독 훈련</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part 3 Content: [쓰기] 악필 교정과 행정 문서 작성 -->
+            <div id="part-3-content" class="content-section hidden space-y-4">
+                <h2 class="text-2xl font-bold text-blue-700 border-b pb-2 mb-4">PART 3. [쓰기] 악필 교정과 행정 문서 작성</h2>
+                <!-- Accordion for Chapter 5 -->
+                <div class="accordion-item border rounded-lg overflow-hidden">
+                    <button class="accordion-button w-full flex justify-between items-center p-4 bg-stone-100 hover:bg-stone-200">
+                        <span class="text-lg font-semibold">Chapter 5. 악필 탈출! 손글씨 클리닉</span>
+                        <span class="icon text-2xl font-light text-blue-600">▼</span>
+                    </button>
+                    <div class="accordion-content bg-white px-5">
+                        <ul class="list-decimal list-inside text-stone-700 space-y-2">
+                            <li>[기본기] 올바른 펜 잡는 법(파지법)과 자세</li>
+                            <li>[워밍업] 선 긋기와 자음/모음 정자체 연습</li>
+                            <li>[숫자 집중 훈련] 의료 사고를 막는 정확한 숫자와 단위 쓰기 (mg, ml, gtt 등)</li>
+                            <li>[실전 연습] 빠른 메모와 가독성 두 마리 토끼 잡기</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Accordion for Chapter 6 -->
+                <div class="accordion-item border rounded-lg overflow-hidden">
+                    <button class="accordion-button w-full flex justify-between items-center p-4 bg-stone-100 hover:bg-stone-200">
+                        <span class="text-lg font-semibold">Chapter 6. 병원 서식 작성 실무</span>
+                        <span class="icon text-2xl font-light text-blue-600">▼</span>
+                    </button>
+                    <div class="accordion-content bg-white px-5">
+                        <ul class="list-decimal list-inside text-stone-700 space-y-2">
+                            <li>초진 기록지 및 문진표 작성법</li>
+                            <li>각종 동의서 및 서약서 기입 요령</li>
+                            <li>[실습] 실제 서식에 빈칸 채우기 (정자체 훈련)</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Accordion for Chapter 7 -->
+                <div class="accordion-item border rounded-lg overflow-hidden">
+                    <button class="accordion-button w-full flex justify-between items-center p-4 bg-stone-100 hover:bg-stone-200">
+                        <span class="text-lg font-semibold">Chapter 7. 프로 일잘러의 비즈니스 글쓰기</span>
+                        <span class="icon text-2xl font-light text-blue-600">▼</span>
+                    </button>
+                    <div class="accordion-content bg-white px-5">
+                        <ul class="list-decimal list-inside text-stone-700 space-y-2">
+                            <li>비즈니스 글쓰기의 3원칙: 명확, 간결, 정확</li>
+                            <li>헷갈리기 쉬운 맞춤법과 병원 행정 용어</li>
+                            <li>공문서와 기안서: 형식을 알면 쉬워진다</li>
+                            <li>이메일 작성의 에티켓</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part 4 Content: [실무] 상황별 응대와 문제 해결 -->
+            <div id="part-4-content" class="content-section hidden space-y-4">
+                <h2 class="text-2xl font-bold text-blue-700 border-b pb-2 mb-4">PART 4. [실무] 상황별 응대와 문제 해결</h2>
+                <!-- Accordion for Chapter 8 -->
+                <div class="accordion-item border rounded-lg overflow-hidden">
+                    <button class="accordion-button w-full flex justify-between items-center p-4 bg-stone-100 hover:bg-stone-200">
+                        <span class="text-lg font-semibold">Chapter 8. 스마트한 보고의 기술</span>
+                        <span class="icon text-2xl font-light text-blue-600">▼</span>
+                    </button>
+                    <div class="accordion-content bg-white px-5">
+                        <ul class="list-decimal list-inside text-stone-700 space-y-2">
+                            <li>구두 보고의 타이밍과 요령 (PREP 기법)</li>
+                            <li>핵심만 콕 집어 전달하는 SBAR 의사소통</li>
+                            <li>회의록 작성과 요약의 기술</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Accordion for Chapter 9 -->
+                <div class="accordion-item border rounded-lg overflow-hidden">
+                    <button class="accordion-button w-full flex justify-between items-center p-4 bg-stone-100 hover:bg-stone-200">
+                        <span class="text-lg font-semibold">Chapter 9. 까다로운 상황과 불만 고객 응대</span>
+                        <span class="icon text-2xl font-light text-blue-600">▼</span>
+                    </button>
+                    <div class="accordion-content bg-white px-5">
+                        <ul class="list-decimal list-inside text-stone-700 space-y-2">
+                            <li>환자의 심리 읽기: 무엇이 그들을 화나게 했는가?</li>
+                            <li>불만 고객 응대 프로세스 (MOT 접점 관리)</li>
+                            <li>갈등을 조정하는 설득과 협상의 기술</li>
+                            <li>감정 노동자를 위한 마음 챙김 (스트레스 관리)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part 5 Content: [취업] 나를 보여주는 커뮤니케이션 & 부록 -->
+            <div id="part-5-content" class="content-section hidden space-y-4">
+                <h2 class="text-2xl font-bold text-blue-700 border-b pb-2 mb-4">PART 5. [취업] 나를 보여주는 커뮤니케이션</h2>
+                <!-- Accordion for Chapter 10 -->
+                <div class="accordion-item border rounded-lg overflow-hidden">
+                    <button class="accordion-button w-full flex justify-between items-center p-4 bg-stone-100 hover:bg-stone-200">
+                        <span class="text-lg font-semibold">Chapter 10. 취업 실전 가이드</span>
+                        <span class="icon text-2xl font-light text-blue-600">▼</span>
+                    </button>
+                    <div class="accordion-content bg-white px-5">
+                        <ul class="list-decimal list-inside text-stone-700 space-y-2">
+                            <li>[글쓰기] 서류 통과를 부르는 자기소개서 작성법</li>
+                            <li>[말하기] 면접관을 사로잡는 면접 스피치와 태도</li>
+                            <li>모의 면접 체크리스트</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h2 class="text-2xl font-bold text-blue-700 border-b pb-2 mb-4 mt-8">[부록] 15주 완성 손글씨 교정 워크북</h2>
+                <div class="bg-stone-100 p-4 rounded-lg">
+                    <ul class="list-disc list-inside text-stone-700 space-y-2 pl-2">
+                        <li>Week 1~2: 선 긋기, 자음/모음, 이름 쓰기</li>
+                        <li>Week 3~5: 의학 용어 및 숫자 쓰기</li>
+                        <li>Week 6~10: 명언 및 짧은 문장 쓰기 (가로/세로)</li>
+                        <li>Week 11~15: 병원 서식 및 방송문 필사</li>
+                    </ul>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-card');
+            const contentSections = document.querySelectorAll('.content-section');
+            const defaultMessage = document.getElementById('default-message');
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+
+            // Navigation logic
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.getAttribute('data-target') + '-content';
+                    const targetContent = document.getElementById(targetId);
+
+                    // Hide default message
+                    defaultMessage.classList.add('hidden');
+
+                    // Handle button active state
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    // Show target content
+                    contentSections.forEach(section => section.classList.add('hidden'));
+                    if (targetContent) {
+                        targetContent.classList.remove('hidden');
+                    }
+                });
+            });
+
+            // Accordion logic
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const isOpen = button.classList.toggle('open');
+                    
+                    if (isOpen) {
+                        content.classList.add('open');
+                        button.querySelector('.icon').textContent = '▲';
+                    } else {
+                        content.classList.remove('open');
+                        button.querySelector('.icon').textContent = '▼';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
