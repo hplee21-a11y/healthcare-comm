@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>보건행정 실무 - 비언어적 커뮤니케이션</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #18bc9c;
+            --accent-color: #e74c3c;
+            --bg-light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            color: #333;
+            background-color: var(--bg-light);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            background: #fff;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        section {
+            background: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            padding: 1.5rem;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .bad { border-left: 5px solid var(--accent-color); }
+        .good { border-left: 5px solid var(--secondary-color); }
+
+        .tip-box {
+            background-color: #e8f8f5;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .card-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>UNIT 2. 태도와 표정 관리</h1>
+    <p>마음을 전달하는 첫 번째 언어, 비언어적 소통</p>
+</header>
+
+<nav>
+    <a href="#intro">도입</a>
+    <a href="#eye">눈 맞춤</a>
+    <a href="#posture">자세</a>
+    <a href="#empathy">공감</a>
+</nav>
+
+<div class="container">
+    
+    <section id="intro">
+        <h2>왜 '비언어적 소통'인가?</h2>
+        <p>마스크 착용이 일상화된 병원 환경에서 입매가 보이지 않기 때문에, 우리는 <strong>'눈'</strong>과 <strong>'자세'</strong>를 통해 더 많은 진심을 전달해야 합니다.</p>
+        <blockquote>"말보다 표정이 환자에게 먼저 말을 겁니다."</blockquote>
+    </section>
+
+    <section id="eye">
+        <h2>1. Eye Contact (눈 맞춤) - 마음의 창</h2>
+        <p>"모니터보다 환자의 눈을 보세요"</p>
+        <div class="card-grid">
+            <div class="card bad">
+                <h3>Bad Case</h3>
+                <p>모니터만 보고 응대하기</p>
+                <small>환자는 자신을 무시한다고 느낍니다.</small>
+            </div>
+            <div class="card good">
+                <h3>Good Case</h3>
+                <p>부드러운 응시</p>
+                <small>경청하고 있음을 알리는 가장 강력한 신호입니다.</small>
+            </div>
+        </div>
+    </section>
+
+    <section id="posture">
+        <h2>2. Open Posture (개방적 자세)</h2>
+        <ul>
+            <li><strong>Lean Forward:</strong> 상체를 약간 앞으로 숙여 적극적인 관심을 표현하세요.</li>
+            <li><strong>No Defensive:</strong> 팔짱을 끼거나 턱을 괴는 자세는 지루함의 신호입니다.</li>
+        </ul>
+        <div class="tip-box">
+            <strong>💡 실무 팁:</strong> 환자가 말을 시작할 때 약 5도 정도 상체를 환자 쪽으로 숙여보세요. 훨씬 정중한 느낌을 줍니다.
+        </div>
+    </section>
+
+    <section id="empathy">
+        <h2>3. 표정의 온도 조절</h2>
+        <p>무조건 웃는 것만이 정답은 아닙니다. 상황에 맞는 진정성이 중요합니다.</p>
+        <div class="card-grid">
+            <div class="card" style="background: #fdf2f2;">
+                <h3>차가운 상황</h3>
+                <p>환자가 통증을 호소할 때 → <strong>진지하고 걱정스러운 표정</strong></p>
+            </div>
+            <div class="card" style="background: #f2fcf6;">
+                <h3>따뜻한 상황</h3>
+                <p>행정 안내/환송 시 → <strong>밝고 온화한 미소</strong></p>
+            </div>
+        </div>
+        <div class="tip-box">
+            <strong>💡 실무 팁:</strong> "아파서 울고 있는 환자 앞에서 웃으며 친절하게 대하는 것은 공감이 아닙니다. 상황에 맞춰 표정의 온도를 조절하세요."
+        </div>
+
+    </section>
+
+</div>
+
+<footer>
+    &copy; 2025 보건의료정보학과 실무 교육 자료 | 교수 ○○○
+</footer>
+
+</body>
+</html>
