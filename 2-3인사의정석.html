@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 3. 인사의 정석: 상황별 인사법과 자세</title>
+    <style>
+        :root {
+            --primary: #34495e;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f1c40f;
+            --danger: #e74c3c;
+            --light: #f9f9f9;
+            --workbook-bg: #fffdf0;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            line-height: 1.7;
+            margin: 0;
+            background-color: #eee;
+            color: #333;
+        }
+
+        .page-wrapper {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        header h1 { margin: 0; font-size: 1.8rem; }
+        header p { margin: 10px 0 0; opacity: 0.8; }
+
+        .content { padding: 2rem; }
+
+        h2 {
+            color: var(--secondary);
+            border-left: 5px solid var(--secondary);
+            padding-left: 15px;
+            margin-top: 2rem;
+        }
+
+        .greeting-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 2rem 0;
+        }
+
+        .greeting-card {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border-top: 5px solid var(--primary);
+        }
+
+        .angle {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--secondary);
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .tip-box {
+            background: #e1f5fe;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-left: 5px solid var(--secondary);
+        }
+
+        /* Workbook Style */
+        .workbook {
+            background: var(--workbook-bg);
+            padding: 2rem;
+            border-top: 2px dashed #ccc;
+        }
+
+        .workbook-h3 {
+            color: #d35400;
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .question {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        .btn-area { text-align: center; padding: 2rem; }
+        .btn {
+            background: var(--secondary);
+            color: white;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn:hover { background: var(--primary); }
+
+        @media print {
+            .btn-area { display: none; }
+            body { background: white; }
+            .page-wrapper { box-shadow: none; margin: 0; max-width: 100%; }
+        }
+
+        @media (max-width: 600px) {
+            .greeting-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+    <header>
+        <h1>Unit 3. 인사의 정석</h1>
+        <p>상황별 인사법과 환자의 마음을 여는 기술</p>
+    </header>
+
+    <div class="content">
+        <blockquote>
+            "인사는 서비스의 시작이자 끝이며, 상대에 대한 존중의 마침표입니다."
+        </blockquote>
+
+        <h2>1. 상황별 인사 각도</h2>
+        <p>상황에 맞는 적절한 인사는 직원의 전문성을 보여줍니다.</p>
+
+        <div class="greeting-grid">
+            <div class="card greeting-card">
+                <span class="angle">15° 목례</span>
+                <p><strong>가벼운 인사</strong><br>복도에서 마주칠 때, 동료 간 인사</p>
+            </div>
+            <div class="card greeting-card">
+                <span class="angle">30° 보통례</span>
+                <p><strong>정중한 인사</strong><br>환자 맞이 및 배웅, 가장 일반적인 인사</p>
+            </div>
+            <div class="card greeting-card">
+                <span class="angle">45° 정중례</span>
+                <p><strong>깊은 인사</strong><br>사과, 깊은 감사, VIP 응대</p>
+            </div>
+        </div>
+
+        <h2>2. 플러스 원(+1) 인사법</h2>
+        <div class="tip-box">
+            <strong>핵심 전략:</strong> 기계적인 "안녕하세요"에 환자의 상황을 고려한 <strong>배려 한 마디</strong>를 더하세요.
+            <ul style="margin-top:10px;">
+                <li>"오늘 바람이 많이 차갑죠? 오시느라 고생하셨습니다."</li>
+                <li>"검사 대기 시간이 길어져서 많이 지루하셨죠? 곧 안내해 드릴게요."</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="workbook">
+        <h3 class="workbook-h3">✍️ 실무역량 강화 워크북</h3>
+
+        <div class="question">
+            <strong>[실무 퀴즈] 상황에 알맞은 인사의 각도를 적으세요.</strong>
+            <div style="margin-top:10px;">
+                1. 원장님과 복도에서 스치듯 마주쳤을 때: <input type="text" style="width:60px;"> 도<br>
+                2. 컴플레인 고객에게 진심으로 사과할 때: <input type="text" style="width:60px;"> 도<br>
+                3. 처음 내원한 환자에게 접수를 안내할 때: <input type="text" style="width:60px;"> 도
+            </div>
+        </div>
+
+        <div class="question">
+            <strong>[시나리오] 나만의 플러스 원(+1) 인사 설계</strong>
+            <p>질문: 비를 흠뻑 맞고 들어온 환자에게 당신이 건넬 첫 인사는?</p>
+            <textarea rows="3" placeholder="예: 안녕하세요! 비가 많이 오는데 오시느라 힘드셨죠? 여기 수건부터 좀 쓰시겠어요?"></textarea>
+        </div>
+
+        <div class="question">
+            <strong>[셀프 체크박스] 인사의 자세 점검</strong>
+            <div style="margin-top:10px;">
+                <label><input type="checkbox"> 숙였을 때 약 0.5초 정도 멈추는가?</label><br>
+                <label><input type="checkbox"> 시선은 발끝 1~1.5m 앞을 향하는가?</label><br>
+                <label><input type="checkbox"> 인사를 하며 밝고 명확한 목소리로 말하는가?</label>
+            </div>
+        </div>
+
+        <div class="btn-area">
+            <button class="btn" onclick="window.print()">워크북 결과 인쇄 / PDF 저장</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p style="text-align: center; color: #999; padding: 2rem; font-size: 0.8rem;">
+        &copy; 2025 Health Care Information Department Practice Kit
+    </p>
+</footer>
+
+</body>
+</html>
